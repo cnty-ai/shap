@@ -118,11 +118,16 @@ def parse_prefix_suffix_for_tokenizer(tokenizer):
                             "does not have a .special_tokens_map['eos_token'] or .special_tokens_map['bos_token'] " + \
                             "property (and .decode) to specify if it is an eos (end) of bos (beginning) token!")
     else:
-        assert len(null_tokens) % 2 == 0, "An odd number of boundary tokens are added to the null string!"
-        keep_prefix = len(null_tokens) // 2
-        keep_suffix = len(null_tokens) // 2
-        # prefix_strlen = len(tokenizer.decode(null_tokens[:keep_prefix]))
-        # suffix_strlen = len(tokenizer.decode(null_tokens[-keep_suffix:]))
+        # assert len(null_tokens) % 2 == 0, "An odd number of boundary tokens are added to the null string!"
+        # keep_prefix = len(null_tokens) // 2
+        # keep_suffix = len(null_tokens) // 2
+        # NB(poudro): we are setting these values with regards to our custom tokenizer
+        # TODO(poudro): make this detectable
+        keep_prefix = 2
+        keep_suffix = 1
+
+        prefix_strlen = len(tokenizer.decode(null_tokens[:keep_prefix]))
+        suffix_strlen = len(tokenizer.decode(null_tokens[-keep_suffix:]))
 
     return {
         'keep_prefix' : keep_prefix,
