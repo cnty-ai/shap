@@ -14,7 +14,7 @@ except ImportError:
 
 # TODO: we should support text output explanations (from models that output text not numbers), this would require the force
 # the force plot and the coloring to update based on mouseovers (or clicks to make it fixed) of the output text
-def text(shap_values, num_starting_labels=0, grouping_threshold=0.01, separator='', xmin=None, xmax=None, cmax=None, display=True):
+def text(shap_values, num_starting_labels=0, grouping_threshold=0.01, separator='', xmin=None, xmax=None, cmax=None, display=True, ret_values=False):
     """ Plots an explanation of a string of text using coloring and interactive labels.
 
     The output is interactive HTML and you can click on any token to toggle the display of the
@@ -45,7 +45,7 @@ def text(shap_values, num_starting_labels=0, grouping_threshold=0.01, separator=
 
     cmax : float
         Maximum absolute shap value for sample. Used for scaling colors for input tokens.
-    
+
     display: bool
         Whether to display or return html to further manipulate or embed. default: True
 
@@ -132,10 +132,10 @@ def text(shap_values, num_starting_labels=0, grouping_threshold=0.01, separator=
     document._zoom_{uuid} = undefined;
     function _output_onclick_{uuid}(i) {{
         var next_id = undefined;
-        
+
         if (document._zoom_{uuid} !== undefined) {{
             document.getElementById(document._zoom_{uuid}+ '_zoom').style.display = 'none';
-            
+
             if (document._zoom_{uuid} === '_tp_{uuid}_output_' + i) {{
                 document.getElementById(document._zoom_{uuid}).style.display = 'block';
                 document.getElementById(document._zoom_{uuid}+'_name').style.borderBottom = '3px solid #000000';
@@ -246,6 +246,9 @@ def text(shap_values, num_starting_labels=0, grouping_threshold=0.01, separator=
 
     values, clustering = unpack_shap_explanation_contents(shap_values)
     tokens, values, group_sizes = process_shap_values(shap_values.data, values, grouping_threshold, separator, clustering)
+    
+    if ret_values:
+        return tokens, values, group_sizes
 
     # build out HTML output one word one at a time
     top_inds = np.argsort(-np.abs(values))[:num_starting_labels]
@@ -302,7 +305,7 @@ def text(shap_values, num_starting_labels=0, grouping_threshold=0.01, separator=
         ipython_display(HTML(out))
     else:
         return out
-        
+
 def process_shap_values(tokens, values, grouping_threshold, separator, clustering = None, return_meta_data  = False):
 
     # See if we got hierarchical input data. If we did then we need to reprocess the 
@@ -807,7 +810,7 @@ def text_old(shap_values, tokens, partition_tree=None, num_starting_labels=0, gr
     from IPython.core.display import display, HTML
     return display(HTML(out))
 
-def text_to_text(shap_values):        
+def text_to_text(shap_values):
 
     from IPython.core.display import display, HTML
     # unique ID added to HTML elements and function to avoid collision of differnent instances
